@@ -1103,8 +1103,8 @@ header .top-bar {
 	top: 0;
 }
 header .logo {
-	width: 150px; /* Make sure the container is the correct size */
-	height: 30px;
+	width: 100px; /* Make sure the container is the correct size */
+	height: 15px;
 	float: left;
 	margin-left: 20px;
 	margin-right: 50px;
