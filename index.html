@@ -207,7 +207,7 @@
 	   				<div class="timeline-header">
 	   					<h3>Cosine Matching</h3>
 	   					<ul style="color: black;">
-							<li style="text-decoration: underline;">Extremely Fast!</li>
+							<li style="text-decoration: underline;">Extremely Fast</li>
 							<li>Passes through data first building the most obvious associations first</li>
 							<li>Works by converting strings to vectors, and compares similarity between the angles of various vectors</li>
 						</ul>
@@ -218,7 +218,11 @@
 					</div>
 	   				<div class="timeline-header">
 	   					<h3>Fuzzy Matching</h3>
-	   					<p>brief ben section here</p>
+	   					<ul style="color: black;">
+							<li style="text-decoration: underline;">Extremely Fast</li>
+							<li>Analyzes data that <span><i>Cosine</i></span> couldn't match, applies fuzzy comparison logic to build more matches</li>
+							<li>Utilizes Levenshtein distance, which measures the number of edits needed to transform one string into another</li>
+						</ul>
 	   				</div>
 
 					<div class="timeline-ico">
@@ -226,7 +230,11 @@
 					</div>
 					<div class="timeline-header">
 						<h3>Grouping Algorithm</h3>
-						<p>brief theo section here</p>
+						<ul style="color: black;">
+							<li style="text-decoration: underline;">Extremely Fast</li>
+							<li>Continues to filter down data by identifying matches that <span><i>Cosine</i></span> and <span><i>Fuzzy</i></span> didn't find</li>
+							<li style="background-color: yellow;">talk to theo about exactly how this works</li>
+						</ul>
 					</div>
 
 	   			</div> <!-- /timeline-block -->
