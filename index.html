@@ -238,7 +238,9 @@
 						<ul style="color: black;">
 							<li style="text-decoration: underline;">Extremely Fast</li>
 							<li>Continues to filter down data by identifying matches that <span><i>Cosine</i></span> and <span><i>Fuzzy</i></span> didn't find</li>
-							<li style="background-color: yellow;">talk to theo about exactly how this works</li>
+							<li>A type of clustering, the grouping algorithm exploits patterns in the data to turn unstructured data into structured data.</li>
+							<li>It takes advantage of the fact that some first name-last name pairs are unique enough that they map to a group of rows in which all the firms are the same, in which case it is very likely that that is the only employee working at that firm with that set of initials.</li>
+							<li>These are high confidence matches, while the remaining groups that map to multiple firms are sectioned into medium and low confidence groups using thresholds where the match is statistically imputed using the mode of the group-wide firm matches. Validation methods confirmed this as an effective and accurate approach that is simple yet powerful.</li>
 						</ul>
 					</div>
 
