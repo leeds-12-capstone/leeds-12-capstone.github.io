@@ -1128,14 +1128,16 @@ header .logo {
 
 header .logo a {
 	display: block;
-	margin: -20px auto 0 auto; /* Moves the logo up by 20px and centers it horizontally */
+	position: relative;
+	top: -20px; /* Moves the logo up by 20px */
+	margin: 0 auto;
 	padding: 0;
 	border: none;
-	text-indent: -9999px; /* Hides text */
+	text-indent: -9999px;
 	background: url("../images/logo2.png") no-repeat center;
-	background-size: 200px auto; /* Shrinks the image to 200px wide, keeps aspect ratio */
+	background-size: 200px auto;
 	width: 200px;
-	height: 50px; /* Adjust based on your logo’s natural height */
+	height: 50px;
 }
 
 
