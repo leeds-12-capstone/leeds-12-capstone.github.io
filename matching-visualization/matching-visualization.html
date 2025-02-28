@@ -1,0 +1,959 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Matching Algorithm Visualization</title>
+    <style>
+      @font-face {
+        font-family: "Geist";
+        src: url("font/Geist-Bold.otf") format("opentype");
+        font-weight: normal;
+        font-style: normal;
+      }
+
+      @font-face {
+        font-family: "GeistMono";
+        src: url("font/GeistMono-Regular.otf") format("opentype");
+        font-weight: normal;
+        font-style: normal;
+      }
+
+      :root {
+        --bg-color: #f5f5f5;
+        --text-color: #222;
+        --box-bg: #ffffff;
+        --border-color: #ccc;
+        --grid-color: rgba(125, 125, 125, 0.75);
+        --button-bg: #ccc;
+      }
+
+      .dark-mode {
+        --bg-color: #222;
+        --text-color: #f5f5f5;
+        --box-bg: #333;
+        --border-color: #444;
+        --grid-color: rgba(255, 255, 255, 0.2);
+        --button-bg: #444;
+      }
+
+      body {
+        text-align: center;
+        background: var(--bg-color);
+        color: var(--text-color);
+        transition: background 0.3s ease, color 0.3s ease;
+      }
+
+      canvas {
+        background: var(--box-bg);
+        display: block;
+        margin: auto;
+        border: 1px solid var(--border-color);
+        cursor: url("icons/scan.png") 16 16, zoom-in;
+      }
+
+      canvas {
+        border-color: var(--border-color);
+      }
+
+      .tab-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 20px;
+        margin-bottom: 10px;
+      }
+
+      .tab-group {
+        display: flex;
+        gap: 10px;
+      }
+
+      .tab-icons {
+        display: flex;
+        gap: 10px;
+        margin-left: 20px;
+      }
+
+      .title {
+        font-family: "Geist", sans-serif;
+        font-size: 28px;
+        font-weight: bold;
+        color: var(--text-color);
+        text-align: center;
+        margin: 20px 0;
+        padding: 10px;
+        background: var(--text-color);
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+        letter-spacing: 1px;
+      }
+
+      .tab {
+        padding: 6px 10px;
+        margin: 5px;
+        font-family: "Geist", sans-serif;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: bold;
+        color: white;
+        transition: background 0.3s, transform 0.1s;
+        border: 1px solid var(--border-color);
+      }
+
+      .tab:nth-child(1) {
+        background-color: #704bfe;
+      }
+      .tab:nth-child(2) {
+        background-color: #3a86ff;
+      }
+      .tab:nth-child(3) {
+        background-color: #ff924c;
+      }
+      .tab:nth-child(4) {
+        background-color: #4cd38a;
+      }
+
+      .tab:hover {
+        transform: scale(1.05);
+        opacity: 0.8;
+      }
+
+      .tab-icons .tab {
+        background: none;
+        padding: 0;
+        border: none;
+        display: flex;
+        align-items: center;
+      }
+
+      .tab-icons img {
+        height: 28px;
+        width: auto;
+        vertical-align: middle;
+        cursor: pointer;
+        transition: transform 0.3s ease-in-out;
+      }
+
+      .tab-icons .tab:first-child img,
+      .tab-icons .tab:nth-child(2) img {
+        height: 22px;
+      }
+
+      .tab-icons .tab:last-child:hover img {
+        transform: rotate(-360deg);
+      }
+
+      .dark-mode .tab-icons img {
+        filter: invert(1);
+      }
+
+      .description-box,
+      #cluster-info-box {
+        font-family: "GeistMono", monospace;
+        font-size: 14px;
+        color: var(--text-color);
+        background: var(--box-bg);
+        border: 1px solid var(--border-color);
+        padding: 10px;
+        margin: 10px auto;
+        width: 600px;
+        text-align: center;
+        border-radius: 5px;
+        box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+        transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+        opacity: 0;
+        visibility: hidden;
+      }
+      #cluster-info-box strong {
+        font-family: "Geist-Bold", sans-serif;
+        font-weight: normal;
+      }
+
+      #cluster-info-box {
+        width: 750px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1 class="title">Algorithms to uncover structure in financial data</h1>
+    <div class="tab-container">
+      <div class="tab-group">
+        <button onclick="formClusters(['A'])" class="tab">1</button>
+        <button onclick="formClusters(['B'])" class="tab">2</button>
+        <button onclick="formClusters(['C', 'D'])" class="tab">3</button>
+        <button onclick="formClusters(['E', 'F', 'G', 'H'])" class="tab">
+          4
+        </button>
+      </div>
+
+      <div class="tab-icons">
+        <button onclick="colorClusters()" class="tab">
+          <img src="icons/brush.png" />
+        </button>
+        <button onclick="toggleDarkMode()" class="tab">
+          <img id="darkModeIcon" src="icons/moon.png" />
+        </button>
+        <button onclick="scatterNodes()" class="tab">
+          <img src="icons/reset.png" />
+        </button>
+      </div>
+    </div>
+
+    <canvas id="canvas"></canvas>
+    <div id="description-box" class="description-box"></div>
+    <div id="cluster-info-box" class="description-box"></div>
+
+    <script>
+      const canvas = document.getElementById("canvas");
+      const ctx = canvas.getContext("2d");
+
+      canvas.width = 750;
+      canvas.height = 750;
+
+      const colors = {
+        person: "black",
+        company: "black",
+        id: "lightgray",
+        name: "black",
+        firmID: "lightgray",
+        analystID: "lightgray",
+        firm: "black",
+        documentID: "black",
+        report: "black",
+      };
+
+      const descriptions = {
+        1: "Cosine: vectorized string comparisons (Max)",
+        2: "Fuzzy: edit distance string comparisons (Ben)",
+        3: "Grouping: identifies structural patterns (Theo + Arjun)",
+        4: "Frequency: forms an internal probability distribution (Joseph + Connor)",
+      };
+
+      const descriptionBox = document.getElementById("description-box");
+
+      document.querySelectorAll(".tab").forEach((button, index) => {
+        const buttonIndex = index + 1;
+        if (buttonIndex <= 4) {
+          button.style.backgroundColor = "#ccc";
+
+          button.addEventListener("mouseover", () => {
+            button.style.backgroundColor = getButtonColor(buttonIndex);
+            descriptionBox.textContent = descriptions[buttonIndex] || "";
+            descriptionBox.style.opacity = "1";
+            descriptionBox.style.visibility = "visible";
+          });
+
+          button.addEventListener("mouseleave", () => {
+            if (
+              !buttonGroups[buttonIndex].some((cluster) =>
+                nodes.some(
+                  (node) =>
+                    node.cluster === cluster &&
+                    node.targetX !== null &&
+                    node.targetY !== null
+                )
+              )
+            ) {
+              button.style.backgroundColor = "#ccc";
+            }
+
+            setTimeout(() => {
+              if (!document.querySelector(".tab:hover")) {
+                descriptionBox.style.opacity = "0";
+                descriptionBox.style.visibility = "hidden";
+              }
+            }, 10);
+          });
+        }
+      });
+
+      let clustersColored = false;
+
+      function colorClusters() {
+        const clusterColors = {
+          A: "#FF4F79",
+          B: "#008C76",
+          C: "#FFB400",
+          D: "#512B81",
+          E: "#00A6FB",
+          F: "#FF5700",
+          G: "#7DCE82",
+          H: "#C3423F",
+        };
+
+        nodes.forEach((node) => {
+          if (!clustersColored) {
+            node.originalColor = node.color || colors[node.type] || "black";
+            node.color = clusterColors[node.cluster] || node.originalColor;
+          } else {
+            node.color = node.originalColor;
+          }
+        });
+
+        clustersColored = !clustersColored;
+        update();
+      }
+
+      const nodes = [
+        {
+          id: 1,
+          type: "report",
+          cluster: "A",
+          label:
+            "Nvidia (NVDA) – Buy: Strong AI and GPU growth support a $950 target (vs. $850). Risks include supply chain issues and competition, but momentum remains strong.  ",
+        },
+        {
+          id: 2,
+          type: "firm",
+          cluster: "A",
+          logo: "st",
+          label: "Santander",
+        },
+        { id: 3, type: "documentID", cluster: "A", label: "Document 620078" },
+        { id: 4, type: "analyst name", cluster: "A", label: "Alex Smith" },
+        { id: 5, type: "firmID", cluster: "A", label: "Firm 917772" },
+        { id: 6, type: "analystID", cluster: "A", label: "Analyst 587958" },
+        {
+          id: 7,
+          type: "report",
+          cluster: "B",
+          label:
+            "Apple (AAPL) – Buy: iPhone and services growth drive a $220 target (vs. $190). Risks include supply chain and regulatory pressures, but ecosystem strength supports upside.",
+        },
+        {
+          id: 8,
+          type: "firm",
+          cluster: "B",
+          logo: "rbc",
+          label: "Royal Bank of Canada",
+        },
+        { id: 9, type: "documentID", cluster: "B", label: "Document 919942" },
+        { id: 10, type: "analyst name", cluster: "B", label: "Andrew Stevens" },
+        { id: 11, type: "firmID", cluster: "B", label: "Firm 116939" },
+        { id: 12, type: "analystID", cluster: "B", label: "Analyst 205348" },
+        {
+          id: 13,
+          type: "report",
+          cluster: "C",
+          label:
+            "Tesla (TSLA) – Hold: EV leadership intact, but demand concerns cap upside at $190 (vs. $195). Energy and autonomy offer potential, but volatility remains.",
+        },
+        { id: 14, type: "firm", cluster: "C", logo: "hsbc", label: "HSBC" },
+        { id: 15, type: "documentID", cluster: "C", label: "Document 868846" },
+        { id: 16, type: "analyst name", cluster: "C", label: "Taylor Brown" },
+        { id: 17, type: "firmID", cluster: "C", label: "Firm 876060" },
+        { id: 18, type: "analystID", cluster: "C", label: "Analyst 665024" },
+        {
+          id: 19,
+          type: "report",
+          cluster: "D",
+          label:
+            "Microsoft (MSFT) – Buy: Azure and AI growth drive a $450 target (vs. $420). Regulatory risks persist, but enterprise dominance keeps outlook strong.",
+        },
+        {
+          id: 20,
+          type: "firm",
+          cluster: "D",
+          logo: "jpm",
+          label: "JP Morgan",
+        },
+        { id: 21, type: "documentID", cluster: "D", label: "Document 928791" },
+        {
+          id: 22,
+          type: "analyst name",
+          cluster: "D",
+          label: "Morgan Williams",
+        },
+        { id: 23, type: "firmID", cluster: "D", label: "Firm 719925" },
+        { id: 24, type: "analystID", cluster: "D", label: "Analyst 141805" },
+        {
+          id: 25,
+          type: "report",
+          cluster: "E",
+          label:
+            "Amazon (AMZN) – Buy: AWS and cost efficiencies support a $200 target (vs. $180). Macro risks remain, but e-commerce and cloud growth provide upside.",
+        },
+        {
+          id: 26,
+          type: "firm",
+          cluster: "E",
+          logo: "barclays",
+          label: "Barclays",
+        },
+        { id: 27, type: "documentID", cluster: "E", label: "Document 371780" },
+        { id: 28, type: "analyst name", cluster: "E", label: "Michael Walker" },
+        { id: 29, type: "firmID", cluster: "E", label: "Firm 320537" },
+        { id: 30, type: "analystID", cluster: "E", label: "Analyst 902060" },
+        {
+          id: 31,
+          type: "report",
+          cluster: "F",
+          label:
+            "Meta (META) – Hold: Ad strength and AI investments push a $480 target (vs. $470). Metaverse spending is uncertain, and competition remains a challenge.",
+        },
+        {
+          id: 32,
+          type: "firm",
+          cluster: "F",
+          logo: "bofa",
+          label: "Bank of America",
+        },
+        { id: 33, type: "documentID", cluster: "F", label: "Document 610230" },
+        { id: 34, type: "analyst name", cluster: "F", label: "Riley Davis" },
+        { id: 35, type: "firmID", cluster: "F", label: "Firm 554181" },
+        { id: 36, type: "analystID", cluster: "F", label: "Analyst 652639" },
+        {
+          id: 37,
+          type: "report",
+          cluster: "G",
+          label:
+            "Alphabet (GOOGL) – Buy: Search, YouTube, and AI fuel a $170 target (vs. $155). Regulatory risks persist, but business diversification supports growth.",
+        },
+        {
+          id: 38,
+          type: "firm",
+          cluster: "G",
+          logo: "de",
+          label: "Deutsche Bank",
+        },
+        { id: 39, type: "documentID", cluster: "G", label: "Document 842886" },
+        { id: 40, type: "analyst name", cluster: "G", label: "Jamie Miller" },
+        { id: 41, type: "firmID", cluster: "G", label: "Firm 896998" },
+        { id: 42, type: "analystID", cluster: "G", label: "Analyst 195423" },
+        {
+          id: 43,
+          type: "report",
+          cluster: "H",
+          label:
+            "Airbnb (ABNB) – Hold: Strong brand and global travel demand support a $170 target (vs. $160). Resilient booking trends and margin expansion drive growth, but regulatory challenges and macroeconomic conditions remain key risks.",
+        },
+        {
+          id: 44,
+          type: "firm",
+          cluster: "H",
+          logo: "gs",
+          label: "Goldman Sachs",
+        },
+        { id: 45, type: "documentID", cluster: "H", label: "Document 616385" },
+        { id: 46, type: "analyst name", cluster: "H", label: "James Matthews" },
+        { id: 47, type: "firmID", cluster: "H", label: "Firm 251906" },
+        { id: 48, type: "analystID", cluster: "H", label: "Analyst 370097" },
+      ];
+
+      const buttonGroups = {
+        1: ["A"],
+        2: ["B"],
+        3: ["C", "D"],
+        4: ["E", "F", "G", "H"],
+      };
+
+      function getButtonColor(buttonIndex) {
+        const colors = {
+          1: "#704bfe",
+          2: "#3a86ff",
+          3: "#ff924c",
+          4: "#4cd38a",
+        };
+        return colors[buttonIndex] || "#ddd";
+      }
+
+      function updateButtonStates() {
+        Object.keys(buttonGroups).forEach((buttonIndex) => {
+          const button = document.querySelector(
+            `.tab:nth-child(${buttonIndex})`
+          );
+          const clusters = buttonGroups[buttonIndex];
+
+          const allClustersApplied = clusters.every((cluster) =>
+            nodes.some(
+              (node) =>
+                node.cluster === cluster &&
+                node.targetX !== null &&
+                node.targetY !== null
+            )
+          );
+
+          if (allClustersApplied) {
+            button.style.backgroundColor = getButtonColor(buttonIndex);
+          } else {
+            button.style.backgroundColor = "#ccc";
+          }
+        });
+      }
+
+      document.querySelectorAll(".tab").forEach((button, index) => {
+        const buttonIndex = index + 1;
+        if (buttonIndex <= 4) {
+          button.style.backgroundColor = "#ccc";
+
+          button.addEventListener("mouseover", () => {
+            button.style.backgroundColor = getButtonColor(buttonIndex);
+          });
+
+          button.addEventListener("mouseleave", () => {
+            if (
+              !buttonGroups[buttonIndex].some((cluster) =>
+                nodes.some(
+                  (node) =>
+                    node.cluster === cluster &&
+                    node.targetX !== null &&
+                    node.targetY !== null
+                )
+              )
+            ) {
+              button.style.backgroundColor = "#ccc";
+            }
+          });
+        }
+      });
+
+      function formClusters(groupSet) {
+        computeClusterCenters();
+        clustering = true;
+
+        nodes.forEach((node) => {
+          if (groupSet.includes(node.cluster)) {
+            let center = clusterCenters[node.cluster];
+            node.targetX = center.x + Math.random() * 40 - 20;
+            node.targetY = center.y + Math.random() * 40 - 20;
+          }
+        });
+
+        setTimeout(updateButtonStates, 500);
+      }
+
+      function toggleDarkMode() {
+        document.body.classList.toggle("dark-mode");
+
+        let darkModeIcon = document.getElementById("darkModeIcon");
+        if (document.body.classList.contains("dark-mode")) {
+          darkModeIcon.src = "icons/sun.png";
+        } else {
+          darkModeIcon.src = "icons/moon.png";
+        }
+
+        update();
+      }
+
+      function resetCluster(cluster) {
+        clustering = false;
+
+        nodes.forEach((node) => {
+          if (node.cluster === cluster) {
+            node.x = node.originalX;
+            node.y = node.originalY;
+
+            node.targetX = null;
+            node.targetY = null;
+          }
+        });
+
+        updateButtonStates();
+      }
+
+      canvas.addEventListener("click", (event) => {
+        let rect = canvas.getBoundingClientRect();
+        let mouseX = event.clientX - rect.left;
+        let mouseY = event.clientY - rect.top;
+
+        nodes.forEach((node) => {
+          let dx = node.x - mouseX;
+          let dy = node.y - mouseY;
+          let distance = Math.sqrt(dx * dx + dy * dy);
+
+          if (distance < 15) {
+            resetCluster(node.cluster);
+          }
+        });
+      });
+
+      function wrapText(ctx, text, x, y, maxWidth, lineHeight) {
+        let words = text.split(" ");
+        let line = "";
+        let lines = [];
+
+        for (let i = 0; i < words.length; i++) {
+          let testLine = line + words[i] + " ";
+          let testWidth = ctx.measureText(testLine).width;
+          if (testWidth > maxWidth && i > 0) {
+            lines.push(line);
+            line = words[i] + " ";
+          } else {
+            line = testLine;
+          }
+        }
+        lines.push(line);
+
+        for (let i = 0; i < lines.length; i++) {
+          ctx.fillText(lines[i], x, y + i * lineHeight);
+        }
+      }
+
+      canvas.addEventListener("mousedown", (event) => {
+        let rect = canvas.getBoundingClientRect();
+        let mouseX = event.clientX - rect.left;
+        let mouseY = event.clientY - rect.top;
+
+        draggingNode = null;
+
+        nodes.forEach((node) => {
+          let dx = node.x - mouseX;
+          let dy = node.y - mouseY;
+          let distance = Math.sqrt(dx * dx + dy * dy);
+
+          if (distance < 15 && node.targetX === null && node.targetY === null) {
+            draggingNode = node;
+            offsetX = dx;
+            offsetY = dy;
+          }
+        });
+      });
+
+      let clusterCenters = {};
+      let hoveredNode = null;
+      let clustering = false;
+      let margin = 20;
+
+      nodes.forEach((node) => {
+        node.x = Math.random() * (canvas.width - 2 * margin) + margin;
+        node.y = Math.random() * (canvas.height - 2 * margin) + margin;
+        node.vx = (Math.random() - 0.5) * 1.25;
+        node.vy = (Math.random() - 0.5) * 1.25;
+        node.targetX = null;
+        node.targetY = null;
+      });
+
+      function drawGrid() {
+        ctx.strokeStyle = "rgba(125, 125, 125, 0.75)";
+        ctx.lineWidth = 0.25;
+        ctx.setLineDash([2, 2]);
+
+        let gridSize = 25;
+
+        ctx.beginPath();
+        for (let x = 0; x < canvas.width; x += gridSize) {
+          ctx.moveTo(x, 0);
+          ctx.lineTo(x, canvas.height);
+        }
+        for (let y = 0; y < canvas.height; y += gridSize) {
+          ctx.moveTo(0, y);
+          ctx.lineTo(canvas.width, y);
+        }
+        ctx.stroke();
+        ctx.setLineDash([]);
+      }
+
+      function computeClusterCenters() {
+        let clusters = {};
+
+        nodes.forEach((node) => {
+          if (!clusters[node.cluster]) {
+            clusters[node.cluster] = { sumX: 0, sumY: 0, count: 0 };
+          }
+          clusters[node.cluster].sumX += node.x;
+          clusters[node.cluster].sumY += node.y;
+          clusters[node.cluster].count++;
+        });
+
+        Object.keys(clusters).forEach((cluster) => {
+          let avgX = clusters[cluster].sumX / clusters[cluster].count;
+          let avgY = clusters[cluster].sumY / clusters[cluster].count;
+
+          let padding = 50;
+          clusterCenters[cluster] = {
+            x: Math.min(Math.max(avgX, padding), canvas.width - padding),
+            y: Math.min(Math.max(avgY, padding), canvas.height - padding),
+          };
+        });
+      }
+
+      function update() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        drawGrid();
+
+        nodes.forEach((node) => {
+          let size = 20;
+          let radius = 5;
+
+          if (clustering && node.targetX !== null && node.targetY !== null) {
+            node.x += (node.targetX - node.x) * 0.1;
+            node.y += (node.targetY - node.y) * 0.1;
+          }
+
+          ctx.save();
+          drawRoundedRect(
+            ctx,
+            node.x - size / 2,
+            node.y - size / 2,
+            size,
+            size,
+            radius
+          );
+          ctx.clip();
+
+          ctx.fillStyle = node.color || colors[node.type] || "black";
+          ctx.fill();
+
+          ctx.restore();
+        });
+
+        if (hoveredNode) {
+          let maxTextWidth = 200;
+          let lineHeight = 16;
+          let paddingX = 8;
+          let paddingY = 4;
+          ctx.font = "14px 'GeistMono', monospace";
+
+          let singleLineWidth = ctx.measureText(hoveredNode.label).width;
+
+          let needsWrapping = singleLineWidth > maxTextWidth;
+
+          let words = hoveredNode.label.split(" ");
+          let lines = [];
+          let line = "";
+          let longestLineWidth = 0;
+
+          if (needsWrapping) {
+            for (let i = 0; i < words.length; i++) {
+              let testLine = line + words[i] + " ";
+              let testWidth = ctx.measureText(testLine).width;
+
+              if (testWidth > maxTextWidth && line.length > 0) {
+                lines.push(line.trim());
+                longestLineWidth = Math.max(
+                  longestLineWidth,
+                  ctx.measureText(line).width
+                );
+                line = words[i] + " ";
+              } else {
+                line = testLine;
+              }
+            }
+            lines.push(line.trim());
+            longestLineWidth = Math.max(
+              longestLineWidth,
+              ctx.measureText(line).width
+            );
+          } else {
+            lines.push(hoveredNode.label);
+            longestLineWidth = singleLineWidth;
+          }
+
+          let textWidth = Math.min(maxTextWidth, longestLineWidth);
+
+          let textHeight = lines.length * lineHeight + paddingY * 2;
+
+          let tooltipX = hoveredNode.x + 10;
+          let tooltipY = hoveredNode.y - textHeight - 5;
+
+          ctx.shadowColor = "rgba(0, 0, 0, 0.2)";
+          ctx.shadowBlur = 4;
+
+          ctx.fillStyle = "rgba(255, 255, 255, 0.95)";
+          ctx.fillRect(
+            tooltipX,
+            tooltipY,
+            textWidth + paddingX * 2,
+            textHeight
+          );
+
+          ctx.shadowBlur = 0;
+
+          ctx.fillStyle = "black";
+          for (let i = 0; i < lines.length; i++) {
+            ctx.fillText(
+              lines[i],
+              tooltipX + paddingX,
+              tooltipY + paddingY + (i + 0.75) * lineHeight
+            );
+          }
+
+          ctx.setLineDash([3, 3]);
+          ctx.strokeStyle = "lightgray";
+          ctx.lineWidth = 1;
+          ctx.beginPath();
+          nodes.forEach((node) => {
+            if (node.cluster === hoveredNode.cluster) {
+              ctx.moveTo(hoveredNode.x, hoveredNode.y);
+              ctx.lineTo(node.x, node.y);
+            }
+          });
+          ctx.stroke();
+          ctx.setLineDash([]);
+          ctx.lineWidth = 0;
+        }
+
+        function drawRoundedRect(ctx, x, y, width, height, radius) {
+          ctx.beginPath();
+          ctx.moveTo(x + radius, y);
+          ctx.lineTo(x + width - radius, y);
+          ctx.arcTo(x + width, y, x + width, y + radius, radius);
+          ctx.lineTo(x + width, y + height - radius);
+          ctx.arcTo(
+            x + width,
+            y + height,
+            x + width - radius,
+            y + height,
+            radius
+          );
+          ctx.lineTo(x + radius, y + height);
+          ctx.arcTo(x, y + height, x, y + height - radius, radius);
+          ctx.lineTo(x, y + radius);
+          ctx.arcTo(x, y, x + radius, y, radius);
+          ctx.closePath();
+        }
+
+        for (let i = 0; i < nodes.length; i++) {
+          for (let j = i + 1; j < nodes.length; j++) {
+            let nodeA = nodes[i];
+            let nodeB = nodes[j];
+
+            let dx = nodeB.x - nodeA.x;
+            let dy = nodeB.y - nodeA.y;
+            let distance = Math.sqrt(dx * dx + dy * dy);
+            let minDist = 20;
+
+            if (distance < minDist) {
+              let overlap = minDist - distance;
+              let angle = Math.atan2(dy, dx);
+
+              let moveX = (overlap / 2) * Math.cos(angle);
+              let moveY = (overlap / 2) * Math.sin(angle);
+
+              nodeA.x -= moveX;
+              nodeA.y -= moveY;
+              nodeB.x += moveX;
+              nodeB.y += moveY;
+
+              [nodeA.vx, nodeB.vx] = [nodeB.vx, nodeA.vx];
+              [nodeA.vy, nodeB.vy] = [nodeB.vy, nodeA.vy];
+            }
+          }
+        }
+
+        requestAnimationFrame(update);
+      }
+
+      nodes.forEach((node) => {
+        node.originalX = node.x;
+        node.originalY = node.y;
+      });
+
+      function scatterNodes() {
+        clustering = false;
+
+        let margin = 20;
+
+        nodes.forEach((node) => {
+          node.x = Math.random() * (canvas.width - 2 * margin) + margin;
+          node.y = Math.random() * (canvas.height - 2 * margin) + margin;
+          node.targetX = null;
+          node.targetY = null;
+        });
+        updateButtonStates();
+      }
+
+      const clusterInfoBox = document.getElementById("cluster-info-box");
+
+      canvas.addEventListener("mousemove", (event) => {
+        let rect = canvas.getBoundingClientRect();
+        let mouseX = event.clientX - rect.left;
+        let mouseY = event.clientY - rect.top;
+
+        if (draggingNode) {
+          draggingNode.x = mouseX + offsetX;
+          draggingNode.y = mouseY + offsetY;
+        } else {
+          hoveredNode = null;
+          let hoveredCluster = null;
+
+          nodes.forEach((node) => {
+            let dx = node.x - mouseX;
+            let dy = node.y - mouseY;
+            let distance = Math.sqrt(dx * dx + dy * dy);
+
+            if (distance < 15) {
+              hoveredNode = node;
+              hoveredCluster = node.cluster;
+            }
+          });
+
+          const cleanLabel = (type, label) => {
+            let prefixPatterns = {
+              documentID: /^Document\s+/i,
+              firmID: /^Firm\s+/i,
+              analystID: /^Analyst\s+/i,
+            };
+
+            if (prefixPatterns[type]) {
+              return label.replace(prefixPatterns[type], "");
+            }
+            return label;
+          };
+
+          if (hoveredCluster) {
+            let clusterNodes = nodes.filter(
+              (node) => node.cluster === hoveredCluster
+            );
+            let clusterText = ``;
+
+            let primaryOrder = ["firm", "report", "documentID"];
+            let secondaryOrder = ["firmID", "analyst name", "analystID"];
+
+            const formatLabel = (type) =>
+              type.replace(/([a-z])([A-Z])/g, "$1 $2");
+
+            const appendNodes = (orderArray) => {
+              orderArray.forEach((type) => {
+                let node = clusterNodes.find((n) => n.type === type);
+                if (node) {
+                  let cleanedLabel = cleanLabel(type, node.label);
+                  clusterText += `<strong style="font-weight: bold;">${formatLabel(
+                    type
+                  ).toUpperCase()}:</strong> ${cleanedLabel}<br>`;
+                }
+              });
+            };
+
+            appendNodes(primaryOrder);
+
+            clusterText += `<br><strong style="font-weight: bold;">+</strong><br><br>`;
+
+            appendNodes(secondaryOrder);
+
+            clusterInfoBox.innerHTML = clusterText;
+            clusterInfoBox.style.opacity = "1";
+            clusterInfoBox.style.visibility = "visible";
+          } else {
+            clusterInfoBox.style.opacity = "0";
+            clusterInfoBox.style.visibility = "hidden";
+          }
+        }
+      });
+
+      canvas.addEventListener("mouseup", () => {
+        if (draggingNode) {
+          draggingNode.originalX = draggingNode.x;
+          draggingNode.originalY = draggingNode.y;
+        }
+        draggingNode = null;
+      });
+
+      canvas.addEventListener("mouseleave", () => {
+        draggingNode = null;
+        hoveredNode = null;
+      });
+      canvas.addEventListener("mouseenter", () => {
+        update();
+      });
+
+      update();
+    </script>
+  </body>
+</html>
