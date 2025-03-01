@@ -51,6 +51,9 @@
         margin: auto;
         border: 1px solid var(--border-color);
         cursor: url("icons/scan.png") 16 16, zoom-in;
+
+        border-radius: 12px;
+        overflow: hidden;
       }
 
       canvas {
@@ -90,6 +93,26 @@
         -webkit-text-fill-color: transparent;
         text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
         letter-spacing: 1px;
+      }
+
+      .title-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+      }
+
+      .title2 {
+        font-family: "GeistMono", monospace;
+        font-size: 18px;
+        font-weight: bold;
+        max-width: 650px;
+        margin: 10px 0 20px 0;
+        color: black;
+      }
+
+      .highlight {
+        color: #1e90ff;
       }
 
       .tab {
@@ -153,6 +176,44 @@
         filter: invert(1);
       }
 
+      .loading-box {
+        border: 1px solid var(--border-color);
+        padding: 10px;
+        border-radius: 6px;
+        text-align: center;
+        margin-top: 20px;
+        margin-bottom: 20px;
+        display: inline-block;
+        width: 120px;
+        background: var(--box-bg);
+      }
+
+      .loading-container {
+        width: 80px;
+        background-color: var(--border-color);
+        border-radius: 4px;
+        height: 8px;
+        overflow: hidden;
+        margin: 10px auto 14px auto;
+        opacity: 0;
+        transition: opacity 0.3s ease-in-out;
+      }
+
+      .loading-bar {
+        height: 100%;
+        width: 0%;
+        background-color: #50c878;
+        transition: width 2s ease-in-out;
+        border-radius: 4px;
+      }
+
+      .percent-text {
+        font-size: 14px;
+        font-weight: bold;
+        color: var(--text-color);
+        margin-top: 5px;
+      }
+
       .description-box,
       #cluster-info-box {
         font-family: "GeistMono", monospace;
@@ -169,6 +230,8 @@
         transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
         opacity: 0;
         visibility: hidden;
+        border-radius: 12px;
+        overflow: hidden;
       }
       #cluster-info-box strong {
         font-family: "Geist-Bold", sans-serif;
@@ -176,12 +239,35 @@
       }
 
       #cluster-info-box {
-        width: 750px;
+        width: 730px;
+        margin: -40px auto 40px auto !important;
+      }
+
+      #typing-text {
+        color: var(--text-color);
+      }
+
+      .dark-mode #cluster-info-box {
+        background: var(--box-bg);
+        color: var(--text-color);
+        border-color: var(--border-color);
+      }
+
+      .dark-mode #cluster-info-box strong {
+        color: var(--text-color);
+      }
+
+      .dark-mode #cluster-info-box span {
+        color: var(--text-color) !important;
       }
     </style>
   </head>
   <body>
-    <h1 class="title">Algorithms to uncover structure in financial data</h1>
+    <div class="title-container">
+      <h1 class="title">Algorithms to uncover structure in financial data</h1>
+      <h5 class="title2" id="typing-text"></h5>
+    </div>
+
     <div class="tab-container">
       <div class="tab-group">
         <button onclick="formClusters(['A'])" class="tab">1</button>
@@ -226,6 +312,7 @@
         firm: "black",
         documentID: "black",
         report: "black",
+        estimid: "lightgray",
       };
 
       const descriptions = {
@@ -273,6 +360,42 @@
         }
       });
 
+      document.addEventListener("DOMContentLoaded", function () {
+        const text = `Finding insights in complex financial data + improving data quality + automating data collection + deanonymizing analyst reporting to foster accountability and transparency.`;
+
+        const highlightWords = [
+          "Finding insights",
+          "improving data quality",
+          "automating",
+          "accountability",
+          "transparency",
+        ];
+        const highlightColor = "#1e90ff";
+
+        const targetElement = document.getElementById("typing-text");
+        let index = 0;
+
+        function typeNextChar() {
+          if (index < text.length) {
+            let currentText = text.slice(0, index + 1);
+
+            highlightWords.forEach((word) => {
+              const regex = new RegExp(`(${word})`, "g");
+              currentText = currentText.replace(
+                regex,
+                `<span style="color:${highlightColor}; font-weight:bold;">$1</span>`
+              );
+            });
+
+            targetElement.innerHTML = currentText;
+            index++;
+            setTimeout(typeNextChar, 30);
+          }
+        }
+
+        typeNextChar();
+      });
+
       let clustersColored = false;
 
       function colorClusters() {
@@ -304,39 +427,43 @@
         {
           id: 1,
           type: "report",
-          cluster: "A",
+          cluster: "H",
           label:
             "Nvidia (NVDA) – Buy: Strong AI and GPU growth support a $950 target (vs. $850). Risks include supply chain issues and competition, but momentum remains strong.  ",
         },
         {
           id: 2,
           type: "firm",
-          cluster: "A",
+          cluster: "H",
           logo: "st",
           label: "Santander",
         },
-        { id: 3, type: "documentID", cluster: "A", label: "Document 620078" },
-        { id: 4, type: "analyst name", cluster: "A", label: "Alex Smith" },
-        { id: 5, type: "firmID", cluster: "A", label: "Firm 917772" },
-        { id: 6, type: "analystID", cluster: "A", label: "Analyst 587958" },
+        { id: 3, type: "documentID", cluster: "H", label: "Document 620078" },
+        { id: 4, type: "analyst name", cluster: "H", label: "Alex Smith" },
+        { id: 5, type: "firmID", cluster: "H", label: "Firm 917772" },
+        { id: 6, type: "analystID", cluster: "H", label: "Analyst 587958" },
+        { id: 49, type: "estimid", cluster: "H", label: "HISPANO" },
+
         {
           id: 7,
           type: "report",
-          cluster: "B",
+          cluster: "D",
           label:
             "Apple (AAPL) – Buy: iPhone and services growth drive a $220 target (vs. $190). Risks include supply chain and regulatory pressures, but ecosystem strength supports upside.",
         },
         {
           id: 8,
           type: "firm",
-          cluster: "B",
+          cluster: "D",
           logo: "rbc",
-          label: "Royal Bank of Canada",
+          label: "RBC Capital Markets (Royal Bank of Canada)",
         },
-        { id: 9, type: "documentID", cluster: "B", label: "Document 919942" },
-        { id: 10, type: "analyst name", cluster: "B", label: "Andrew Stevens" },
-        { id: 11, type: "firmID", cluster: "B", label: "Firm 116939" },
-        { id: 12, type: "analystID", cluster: "B", label: "Analyst 205348" },
+        { id: 9, type: "documentID", cluster: "D", label: "Document 919942" },
+        { id: 10, type: "analyst name", cluster: "D", label: "Andrew Stevens" },
+        { id: 11, type: "firmID", cluster: "D", label: "Firm 116939" },
+        { id: 12, type: "analystID", cluster: "D", label: "Analyst 205348" },
+        { id: 50, type: "estimid", cluster: "D", label: "RBCDOMIN" },
+
         {
           id: 13,
           type: "report",
@@ -349,29 +476,33 @@
         { id: 16, type: "analyst name", cluster: "C", label: "Taylor Brown" },
         { id: 17, type: "firmID", cluster: "C", label: "Firm 876060" },
         { id: 18, type: "analystID", cluster: "C", label: "Analyst 665024" },
+        { id: 51, type: "estimid", cluster: "C", label: "CAPELEUR" },
+
         {
           id: 19,
           type: "report",
-          cluster: "D",
+          cluster: "B",
           label:
             "Microsoft (MSFT) – Buy: Azure and AI growth drive a $450 target (vs. $420). Regulatory risks persist, but enterprise dominance keeps outlook strong.",
         },
         {
           id: 20,
           type: "firm",
-          cluster: "D",
+          cluster: "B",
           logo: "jpm",
           label: "JP Morgan",
         },
-        { id: 21, type: "documentID", cluster: "D", label: "Document 928791" },
+        { id: 21, type: "documentID", cluster: "B", label: "Document 928791" },
         {
           id: 22,
           type: "analyst name",
-          cluster: "D",
+          cluster: "B",
           label: "Morgan Williams",
         },
-        { id: 23, type: "firmID", cluster: "D", label: "Firm 719925" },
-        { id: 24, type: "analystID", cluster: "D", label: "Analyst 141805" },
+        { id: 23, type: "firmID", cluster: "B", label: "Firm 719925" },
+        { id: 24, type: "analystID", cluster: "B", label: "Analyst 141805" },
+        { id: 52, type: "estimid", cluster: "B", label: "JPMORGAN" },
+
         {
           id: 25,
           type: "report",
@@ -390,6 +521,8 @@
         { id: 28, type: "analyst name", cluster: "E", label: "Michael Walker" },
         { id: 29, type: "firmID", cluster: "E", label: "Firm 320537" },
         { id: 30, type: "analystID", cluster: "E", label: "Analyst 902060" },
+        { id: 53, type: "estimid", cluster: "E", label: "FRCLAYSC" },
+
         {
           id: 31,
           type: "report",
@@ -402,12 +535,14 @@
           type: "firm",
           cluster: "F",
           logo: "bofa",
-          label: "Bank of America",
+          label: "BofA Global Research (Bank of America)",
         },
         { id: 33, type: "documentID", cluster: "F", label: "Document 610230" },
         { id: 34, type: "analyst name", cluster: "F", label: "Riley Davis" },
         { id: 35, type: "firmID", cluster: "F", label: "Firm 554181" },
         { id: 36, type: "analystID", cluster: "F", label: "Analyst 652639" },
+        { id: 54, type: "estimid", cluster: "F", label: "MERRILL" },
+
         {
           id: 37,
           type: "report",
@@ -426,24 +561,27 @@
         { id: 40, type: "analyst name", cluster: "G", label: "Jamie Miller" },
         { id: 41, type: "firmID", cluster: "G", label: "Firm 896998" },
         { id: 42, type: "analystID", cluster: "G", label: "Analyst 195423" },
+        { id: 55, type: "estimid", cluster: "G", label: "LAWRENCE" },
+
         {
           id: 43,
           type: "report",
-          cluster: "H",
+          cluster: "A",
           label:
             "Airbnb (ABNB) – Hold: Strong brand and global travel demand support a $170 target (vs. $160). Resilient booking trends and margin expansion drive growth, but regulatory challenges and macroeconomic conditions remain key risks.",
         },
         {
           id: 44,
           type: "firm",
-          cluster: "H",
+          cluster: "A",
           logo: "gs",
           label: "Goldman Sachs",
         },
-        { id: 45, type: "documentID", cluster: "H", label: "Document 616385" },
-        { id: 46, type: "analyst name", cluster: "H", label: "James Matthews" },
-        { id: 47, type: "firmID", cluster: "H", label: "Firm 251906" },
-        { id: 48, type: "analystID", cluster: "H", label: "Analyst 370097" },
+        { id: 45, type: "documentID", cluster: "A", label: "Document 616385" },
+        { id: 46, type: "analyst name", cluster: "A", label: "James Matthews" },
+        { id: 47, type: "firmID", cluster: "A", label: "Firm 251906" },
+        { id: 48, type: "analystID", cluster: "A", label: "Analyst 370097" },
+        { id: 56, type: "estimid", cluster: "A", label: "GOLDMAN" },
       ];
 
       const buttonGroups = {
@@ -903,8 +1041,8 @@
             );
             let clusterText = ``;
 
-            let primaryOrder = ["firm", "report", "documentID"];
-            let secondaryOrder = ["firmID", "analyst name", "analystID"];
+            let primaryOrder = ["firm", "report", "documentID", "analyst name"];
+            let secondaryOrder = ["estimid", "firmID", "analystID"];
 
             const formatLabel = (type) =>
               type.replace(/([a-z])([A-Z])/g, "$1 $2");
@@ -914,16 +1052,88 @@
                 let node = clusterNodes.find((n) => n.type === type);
                 if (node) {
                   let cleanedLabel = cleanLabel(type, node.label);
+                  let color = document.body.classList.contains("dark-mode")
+                    ? "white"
+                    : "black";
+                  if (
+                    ["A", "B"].includes(hoveredCluster) &&
+                    (type === "firm" || type === "estimid")
+                  ) {
+                    color = "#50C878";
+                  }
+
+                  if (
+                    ["C", "D", "E", "F", "G", "H"].includes(hoveredCluster) &&
+                    (type === "firm" || type === "estimid")
+                  ) {
+                    color = "#DC143C";
+                  }
+
                   clusterText += `<strong style="font-weight: bold;">${formatLabel(
                     type
-                  ).toUpperCase()}:</strong> ${cleanedLabel}<br>`;
+                  ).toUpperCase()}:</strong> <span style="color:${color}!important">${cleanedLabel}</span><br>`;
                 }
               });
             };
 
             appendNodes(primaryOrder);
+            let targetPercentage;
+            let similarityText;
 
-            clusterText += `<br><strong style="font-weight: bold;">+</strong><br><br>`;
+            if (hoveredCluster === "A") {
+              targetPercentage = 57.97;
+              similarityText = "Cosine similarity";
+            } else if (hoveredCluster === "B") {
+              targetPercentage = 88.89;
+              similarityText = "Fuzzy similarity";
+            } else if (["C", "D"].includes(hoveredCluster)) {
+              targetPercentage = hoveredCluster === "C" ? 90.12 : 97.89;
+              similarityText = "Structural similarity";
+            } else if (["E", "F", "G", "H"].includes(hoveredCluster)) {
+              let percentMap = { E: 79.01, F: 98.76, G: 81.35, H: 95.49 };
+              targetPercentage = percentMap[hoveredCluster];
+              similarityText = "Match likelihood";
+            }
+            clusterText += `
+    <div class="loading-box">
+      <div>${similarityText}:</div>
+      <div class="loading-container" id="loading-bar-container">
+        <div class="loading-bar" id="loading-bar"></div>
+      </div>
+      <div class="percent-text" id="percent-text">0.00%</div>
+    </div><br>
+  `;
+
+            setTimeout(() => {
+              let loadingBar = document.getElementById("loading-bar");
+              let loadingContainer = document.getElementById(
+                "loading-bar-container"
+              );
+              let percentText = document.getElementById("percent-text");
+
+              if (loadingBar && loadingContainer && percentText) {
+                loadingContainer.style.opacity = "1";
+
+                let duration = 1000;
+                let intervalTime = 20;
+                let steps = duration / intervalTime;
+                let increment = targetPercentage / steps;
+                let currentPercent = 0;
+
+                loadingBar.style.transition = `width ${duration}ms linear`;
+                loadingBar.style.width = `${targetPercentage}%`;
+
+                let interval = setInterval(() => {
+                  if (currentPercent >= targetPercentage) {
+                    clearInterval(interval);
+                    percentText.textContent = `${targetPercentage.toFixed(2)}%`;
+                  } else {
+                    currentPercent += increment;
+                    percentText.textContent = `${currentPercent.toFixed(2)}%`;
+                  }
+                }, intervalTime);
+              }
+            }, 100);
 
             appendNodes(secondaryOrder);
 
@@ -934,6 +1144,16 @@
             clusterInfoBox.style.opacity = "0";
             clusterInfoBox.style.visibility = "hidden";
           }
+        }
+      });
+
+      clusterInfoBox.addEventListener("mouseleave", () => {
+        let loadingBar = document.getElementById("loading-bar");
+        let loadingContainer = document.getElementById("loading-bar-container");
+
+        if (loadingBar && loadingContainer) {
+          loadingBar.style.width = "0%";
+          loadingContainer.style.opacity = "0";
         }
       });
 
