@@ -8,14 +8,14 @@
     <style>
       @font-face {
         font-family: "Geist";
-        src: url("font/Geist-Bold.otf") format("opentype");
+        src: url("fonts/Geist-Bold.otf") format("opentype");
         font-weight: normal;
         font-style: normal;
       }
 
       @font-face {
         font-family: "GeistMono";
-        src: url("font/GeistMono-Regular.otf") format("opentype");
+        src: url("fonts/GeistMono-Regular.otf") format("opentype");
         font-weight: normal;
         font-style: normal;
       }
@@ -260,6 +260,19 @@
       .dark-mode #cluster-info-box span {
         color: var(--text-color) !important;
       }
+
+      #cluster-progress-container {
+        font-family: "GeistMono", monospace;
+        font-size: 16px;
+        font-weight: bold;
+        color: var(--text-color);
+        background: var(--box-bg);
+        border: 1px solid var(--border-color);
+        padding: 8px 14px;
+        border-radius: 6px;
+        margin-left: 20px;
+        transition: background 0.3s ease-in-out;
+      }
     </style>
   </head>
   <body>
@@ -289,6 +302,10 @@
           <img src="icons/reset.png" />
         </button>
       </div>
+
+      <div id="cluster-progress-container">
+        <span>Matches Found: <strong id="cluster-progress">0.00%</strong></span>
+      </div>
     </div>
 
     <canvas id="canvas"></canvas>
@@ -296,6 +313,10 @@
     <div id="cluster-info-box" class="description-box"></div>
 
     <script>
+      let draggingNode = null;
+      let offsetX = 0;
+      let offsetY = 0;
+
       const canvas = document.getElementById("canvas");
       const ctx = canvas.getContext("2d");
 
@@ -360,6 +381,58 @@
         }
       });
 
+      function animatePercentage(targetPercentage) {
+        let progressElement = document.getElementById("cluster-progress");
+        let currentPercentage = parseFloat(progressElement.innerText) || 0;
+        let step = (targetPercentage - currentPercentage) / 30;
+
+        let count = 0;
+        let interval = setInterval(() => {
+          if (count >= 30) {
+            clearInterval(interval);
+            updatePercentageDisplay(targetPercentage, true);
+          } else {
+            currentPercentage += step;
+            updatePercentageDisplay(currentPercentage, false);
+            count++;
+          }
+        }, 20);
+      }
+
+      function updatePercentageDisplay(percentage, isFinal) {
+        let progressElement = document.getElementById("cluster-progress");
+        let formattedPercentage = formatPercentage(percentage);
+
+        if (isFinal && percentage >= 100) {
+          progressElement.style.color = "#50C878";
+          progressElement.style.fontWeight = "bold";
+          progressElement.innerHTML = `${formattedPercentage} 😊`;
+        } else {
+          progressElement.style.color = "";
+          progressElement.style.fontWeight = "normal";
+          progressElement.innerText = formattedPercentage;
+        }
+      }
+
+      function formatPercentage(value) {
+        return `${value.toFixed(2)}%`;
+      }
+
+      function checkFullMatch(percentage) {
+        let progressElement = document.getElementById("cluster-progress");
+        if (percentage >= 100) {
+          progressElement.style.color = "#50C878";
+          progressElement.style.fontWeight = "bold";
+        } else {
+          progressElement.style.color = "";
+          progressElement.style.fontWeight = "normal";
+        }
+      }
+
+      function formatPercentage(value) {
+        return `${value.toFixed(2)}%`;
+      }
+
       document.addEventListener("DOMContentLoaded", function () {
         const text = `Finding insights in complex financial data, improving data quality, automating data collection, and deanonymizing analyst reporting to foster accountability and transparency.`;
 
@@ -389,7 +462,7 @@
 
             targetElement.innerHTML = currentText;
             index++;
-            setTimeout(typeNextChar, 30);
+            setTimeout(typeNextChar, 10);
           }
         }
 
@@ -602,6 +675,10 @@
       }
 
       function updateButtonStates() {
+        let totalClusters = 8;
+
+        let formedClusters = new Set();
+
         Object.keys(buttonGroups).forEach((buttonIndex) => {
           const button = document.querySelector(
             `.tab:nth-child(${buttonIndex})`
@@ -619,10 +696,27 @@
 
           if (allClustersApplied) {
             button.style.backgroundColor = getButtonColor(buttonIndex);
+            clusters.forEach((cluster) => formedClusters.add(cluster));
           } else {
             button.style.backgroundColor = "#ccc";
+            clusters.forEach((cluster) => {
+              if (
+                nodes.some(
+                  (node) =>
+                    node.cluster === cluster &&
+                    node.targetX !== null &&
+                    node.targetY !== null
+                )
+              ) {
+                formedClusters.add(cluster);
+              }
+            });
           }
         });
+
+        let percentage = (formedClusters.size / totalClusters) * 100;
+
+        animatePercentage(percentage);
       }
 
       document.querySelectorAll(".tab").forEach((button, index) => {
@@ -663,6 +757,7 @@
           }
         });
 
+        updateButtonStates();
         setTimeout(updateButtonStates, 500);
       }
 
