@@ -176,6 +176,11 @@
         filter: invert(1);
       }
 
+        .dark-mode canvas {
+    cursor: url("icons/scan-inverted.png") 16 16, zoom-in;
+  }
+
+
       .loading-box {
         border: 1px solid var(--border-color);
         padding: 10px;
@@ -406,7 +411,7 @@
         if (isFinal && percentage >= 100) {
           progressElement.style.color = "#50C878";
           progressElement.style.fontWeight = "bold";
-          progressElement.innerHTML = `${formattedPercentage} 😊`;
+          progressElement.innerHTML = `${formattedPercentage}`;
         } else {
           progressElement.style.color = "";
           progressElement.style.fontWeight = "normal";
