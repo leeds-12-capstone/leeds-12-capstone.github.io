@@ -176,10 +176,9 @@
         filter: invert(1);
       }
 
-        .dark-mode canvas {
-    cursor: url("icons/scan-inverted.png") 16 16, zoom-in;
-  }
-
+      .dark-mode canvas {
+        cursor: url("icons/scan-inverted.png") 16 16, zoom-in;
+      }
 
       .loading-box {
         border: 1px solid var(--border-color);
@@ -202,6 +201,15 @@
         margin: 10px auto 14px auto;
         opacity: 0;
         transition: opacity 0.3s ease-in-out;
+      }
+
+      .arrange-button {
+        transition: box-shadow 0.3s ease-in-out, transform 0.2s ease-in-out;
+      }
+
+      .arrange-button:hover {
+        box-shadow: 0 0 15px rgba(255, 223, 0, 0.8);
+        transform: scale(1.05);
       }
 
       .loading-bar {
@@ -763,7 +771,10 @@
         });
 
         updateButtonStates();
-        setTimeout(updateButtonStates, 500);
+        setTimeout(() => {
+          updateButtonStates();
+          checkAndShowArrangeButton();
+        }, 500);
       }
 
       function toggleDarkMode() {
@@ -791,7 +802,7 @@
             node.targetY = null;
           }
         });
-
+        checkAndShowArrangeButton();
         updateButtonStates();
       }
 
@@ -917,6 +928,7 @@
 
         nodes.forEach((node) => {
           let size = 20;
+
           let radius = 5;
 
           if (clustering && node.targetX !== null && node.targetY !== null) {
@@ -1246,6 +1258,141 @@
           }
         }
       });
+
+      let arrangeButton = null;
+      function createArrangeButton() {
+        if (!arrangeButton) {
+          arrangeButton = document.createElement("button");
+          arrangeButton.textContent = "Arrange";
+          arrangeButton.className = "tab arrange-button";
+          arrangeButton.style.backgroundColor = "white";
+          arrangeButton.style.color = "black";
+          arrangeButton.style.marginTop = "10px";
+          arrangeButton.style.display = "none";
+          arrangeButton.onclick = arrangeClusters;
+          document.querySelector(".tab-container").appendChild(arrangeButton);
+
+          arrangeButton.addEventListener("mouseenter", () =>
+            toggleNodePop(true)
+          );
+        }
+      }
+
+      function toggleNodePop(isHovered) {
+        if (isHovered) {
+          nodes.forEach((node) => {
+            node.isPopping = true;
+          });
+
+          setTimeout(() => {
+            nodes.forEach((node) => {
+              node.isPopping = false;
+            });
+            update();
+          }, 500);
+        }
+        update();
+      }
+
+      function checkAndShowArrangeButton() {
+        let allClustersFormed = nodes.every(
+          (node) => node.targetX !== null && node.targetY !== null
+        );
+
+        if (arrangeButton) {
+          arrangeButton.style.display = allClustersFormed ? "block" : "none";
+        }
+      }
+
+      function arrangeClusters() {
+        let columnSpacing = 50;
+        let startX = 175;
+        let clusters = {};
+
+        nodes.forEach((node) => {
+          if (!clusters[node.cluster]) {
+            clusters[node.cluster] = [];
+          }
+          clusters[node.cluster].push(node);
+        });
+
+        let sortedClusterKeys = ["A", "B", "C", "D", "E", "F", "G", "H"].filter(
+          (c) => clusters[c]
+        );
+
+        let totalClusterRows = Object.keys(clusters).length;
+        let totalHeight = totalClusterRows * 80;
+        let startY = 95;
+
+        let rowIndex = 0;
+        sortedClusterKeys.forEach((cluster) => {
+          let yOffset = startY + rowIndex * 80;
+
+          let leftNodes = [];
+          let rightNodes = [];
+
+          clusters[cluster].forEach((node) => {
+            if (
+              ["firm", "report", "documentID", "analyst name"].includes(
+                node.type
+              )
+            ) {
+              leftNodes.push(node);
+            } else {
+              rightNodes.push(node);
+            }
+          });
+
+          leftNodes.sort(sortByType);
+          rightNodes.sort(sortByType);
+
+          positionNodesHorizontally(leftNodes, startX, yOffset, columnSpacing);
+          positionNodesHorizontally(
+            rightNodes,
+            startX + 300,
+            yOffset,
+            columnSpacing
+          );
+
+          rowIndex++;
+        });
+
+        update();
+
+        if (arrangeButton) {
+          arrangeButton.style.display = "none";
+        }
+      }
+
+      function positionNodesHorizontally(nodes, startX, startY, spacing) {
+        nodes.forEach((node, index) => {
+          node.targetX = startX + index * spacing;
+          node.targetY = startY;
+        });
+      }
+
+      function sortByType(a, b) {
+        let order = [
+          "firm",
+          "report",
+          "documentID",
+          "analyst name",
+          "estimid",
+          "firmID",
+          "analystID",
+        ];
+        return order.indexOf(a.type) - order.indexOf(b.type);
+      }
+
+      function positionNodes(nodes, x, startY) {
+        let spacing = 30;
+        nodes.forEach((node, index) => {
+          node.targetX = x;
+          node.targetY = startY + index * spacing;
+        });
+      }
+
+      document.addEventListener("DOMContentLoaded", createArrangeButton);
 
       clusterInfoBox.addEventListener("mouseleave", () => {
         let loadingBar = document.getElementById("loading-bar");
