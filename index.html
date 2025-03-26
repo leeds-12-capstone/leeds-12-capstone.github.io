@@ -493,6 +493,16 @@
             .member h2 {
                 margin: 0;
                 color: #fff;
+                position: relative;
+                display: inline-block;
+            }
+            .member h2::after {
+                content: "";
+                display: block;
+                width: 100%;
+                height: 4px;
+                background: #ff66b2;
+                margin-top: 5px;
             }
             .member h3 {
                 margin: 5px 0;
