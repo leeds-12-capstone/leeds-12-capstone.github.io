@@ -460,63 +460,96 @@
         </div>
     </div> <!-- /section-intro -->
 
-    <div class="row services-content" style="display: flex; flex-wrap: wrap; justify-content: space-between;">
-
-        <!-- Team Member 1 -->
-        <div style="background-color: #333333; color: white; padding: 40px; border-radius: 10px; font-size: 1.2rem; box-shadow: 2px 2px 10px rgba(255, 0, 119, 0.5); width: 48%; margin-bottom: 20px;">
-            <div style="display: flex; flex-direction: column; align-items: center;">
-                <img src="path-to-image/joseph.jpg" alt="Joseph" style="border-radius: 50%; width: 150px; height: 150px; object-fit: cover; margin-bottom: 20px;">
-                <h3>Joseph</h3>
-                <p>Joseph</p>
+	<div class="team-section">
+        <style>
+            .team-section {
+                font-family: Arial, sans-serif;
+                background-color: #111;
+                color: #fff;
+                width: 80%;
+                margin: auto;
+                padding: 50px 0;
+            }
+            .member {
+                display: flex;
+                align-items: center;
+                background: #333;
+                padding: 20px;
+                margin-bottom: 10px;
+                border-radius: 10px;
+            }
+            .member:nth-child(even) {
+                flex-direction: row-reverse;
+            }
+            .member img {
+                width: 120px;
+                height: 120px;
+                border-radius: 50%;
+                border: 3px solid #FF0077;
+                margin: 0 20px;
+            }
+            .member-info {
+                flex: 1;
+            }
+            .member h2 {
+                margin: 0;
+                color: #FF0077;
+            }
+            .member h3 {
+                margin: 5px 0;
+                font-weight: normal;
+                color: #ccc;
+            }
+        </style>
+        <div class="member">
+            <img src="profile1.jpg" alt="Profile 1">
+            <div class="member-info">
+                <h2>John Doe</h2>
+                <h3>2025 | Computer Science</h3>
+                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus imperdiet.</p>
             </div>
         </div>
-
-        <!-- Team Member 2 -->
-        <div style="background-color: #333333; color: white; padding: 40px; border-radius: 10px; font-size: 1.2rem; box-shadow: 2px 2px 10px rgba(255, 0, 119, 0.5); width: 48%; margin-bottom: 20px;">
-            <div style="display: flex; flex-direction: column; align-items: center;">
-                <img src="path-to-image/connor.jpg" alt="Connor" style="border-radius: 50%; width: 150px; height: 150px; object-fit: cover; margin-bottom: 20px;">
-                <h3>Connor</h3>
-                <p>Connor</p>
+        <div class="member">
+            <img src="profile2.jpg" alt="Profile 2">
+            <div class="member-info">
+                <h2>Jane Smith</h2>
+                <h3>2024 | Business Administration</h3>
+                <p>Curabitur bibendum, lorem at consectetur tincidunt, nisl ligula facilisis.</p>
             </div>
         </div>
-
-        <!-- Team Member 3 -->
-        <div style="background-color: #333333; color: white; padding: 40px; border-radius: 10px; font-size: 1.2rem; box-shadow: 2px 2px 10px rgba(255, 0, 119, 0.5); width: 48%; margin-bottom: 20px;">
-            <div style="display: flex; flex-direction: column; align-items: center;">
-                <img src="path-to-image/max.jpg" alt="Max" style="border-radius: 50%; width: 150px; height: 150px; object-fit: cover; margin-bottom: 20px;">
-                <h3>Max</h3>
-                <p>Max</p>
+        <div class="member">
+            <img src="profile3.jpg" alt="Profile 3">
+            <div class="member-info">
+                <h2>Emily Johnson</h2>
+                <h3>2023 | Graphic Design</h3>
+                <p>Praesent tincidunt, lectus eu sodales laoreet, nunc ligula efficitur nisi.</p>
             </div>
         </div>
-
-        <!-- Team Member 4 -->
-        <div style="background-color: #333333; color: white; padding: 40px; border-radius: 10px; font-size: 1.2rem; box-shadow: 2px 2px 10px rgba(255, 0, 119, 0.5); width: 48%; margin-bottom: 20px;">
-            <div style="display: flex; flex-direction: column; align-items: center;">
-                <img src="path-to-image/ben.jpg" alt="Ben" style="border-radius: 50%; width: 150px; height: 150px; object-fit: cover; margin-bottom: 20px;">
-                <h3>Ben</h3>
-                <p>Ben</p>
+        <div class="member">
+            <img src="profile4.jpg" alt="Profile 4">
+            <div class="member-info">
+                <h2>Michael Brown</h2>
+                <h3>2026 | Engineering</h3>
+                <p>Suspendisse potenti. Integer aliquam sagittis massa eget vehicula.</p>
             </div>
         </div>
-
-        <!-- Team Member 5 -->
-        <div style="background-color: #333333; color: white; padding: 40px; border-radius: 10px; font-size: 1.2rem; box-shadow: 2px 2px 10px rgba(255, 0, 119, 0.5); width: 48%; margin-bottom: 20px;">
-            <div style="display: flex; flex-direction: column; align-items: center;">
-                <img src="path-to-image/theo.jpg" alt="Theo" style="border-radius: 50%; width: 150px; height: 150px; object-fit: cover; margin-bottom: 20px;">
-                <h3>Theo</h3>
-                <p>Theo</p>
+        <div class="member">
+            <img src="profile5.jpg" alt="Profile 5">
+            <div class="member-info">
+                <h2>Sarah White</h2>
+                <h3>2025 | Marketing</h3>
+                <p>Quisque lobortis, magna et gravida facilisis, lacus nisl faucibus sapien.</p>
             </div>
         </div>
-
-        <!-- Team Member 6 -->
-        <div style="background-color: #333333; color: white; padding: 40px; border-radius: 10px; font-size: 1.2rem; box-shadow: 2px 2px 10px rgba(255, 0, 119, 0.5); width: 48%; margin-bottom: 20px;">
-            <div style="display: flex; flex-direction: column; align-items: center;">
-                <img src="path-to-image/arjun.jpg" alt="Arjun" style="border-radius: 50%; width: 150px; height: 150px; object-fit: cover; margin-bottom: 20px;">
-                <h3>Arjun</h3>
-                <p>Arjun</p>
+        <div class="member">
+            <img src="profile6.jpg" alt="Profile 6">
+            <div class="member-info">
+                <h2>David Lee</h2>
+                <h3>2024 | Data Science</h3>
+                <p>Donec consequat justo eget augue fringilla, a commodo nulla pharetra.</p>
             </div>
         </div>
-
-    </div> <!-- /services-content -->
+    </div>
 
 </section> <!-- /about-us -->
 
