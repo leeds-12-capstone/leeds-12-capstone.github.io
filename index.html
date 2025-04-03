@@ -510,20 +510,25 @@
                 color: #ccc;
             }
 			.linkedin-img {
-				width: 24px; /* Adjust size */
-				height: 24px;
-				vertical-align: middle; /* Aligns properly with text */
+				width: 24px !important;  /* Ensure the size is strictly applied */
+				height: 24px !important;
+				vertical-align: middle;  /* Align with text */
+				display: inline-block;  /* Ensure it stays in line */
+			}
+			.fa-linkedin {
+				font-size: 24px;
+				color: #0077b5; /* LinkedIn's official blue */
 			}
         </style>
         <div class="member">
             <img src="images/joseph_photo.jpg" alt="Profile 1">
             <div class="member-info">
                 <h2>Joseph Allred
-					<a href="hhttps://github.com/jsallred" target="_blank" class="github-icon">
+					<a href="https://github.com/jsallred" target="_blank" class="github-icon">
 						<i class="fa fa-github" aria-hidden="true"></i>
 					</a>
 					<a href="https://www.linkedin.com/in/joseph-allred-902789254/" target="_blank" class="linkedin-icon">
-						<img src="images/linkedin.png" alt="LinkedIn" class="linkedin-img">
+						<i class="fa fa-linkedin" aria-hidden="true"></i>
 					</a>
 
 				</h2>
