@@ -72,6 +72,44 @@
         display: flex;
         gap: 10px;
       }
+      @media (max-width: 768px) {
+  canvas {
+    width: 90vw !important;
+    height: 90vw !important;
+  }
+
+  .title {
+    font-size: 20px;
+    padding: 0 10px;
+  }
+
+  .title2 {
+    font-size: 14px;
+    max-width: 90vw;
+    padding: 0 10px;
+  }
+
+  .tab-container {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .tab-group {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  #cluster-info-box,
+  .description-box {
+    width: 90vw !important;
+    font-size: 13px;
+  }
+
+  #cluster-progress-container {
+    margin-left: 0;
+    margin-top: 10px;
+  }
+}
 
       .tab-icons {
         display: flex;
@@ -326,6 +364,7 @@
     <div id="cluster-info-box" class="description-box"></div>
 
     <script>
+      
       let draggingNode = null;
       let offsetX = 0;
       let offsetY = 0;
